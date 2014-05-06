@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+  <title>uwants-repeater</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <link href="/static/css/bootstrap.css" rel="stylesheet" type="text/css" />
+  <link href="/static/css/custom.css" rel="stylesheet" type="text/css" />
+  <script type="text/javascript" src="/static/js/jquery.js"></script>
+  <script type="text/javascript" src="/static/js/bootstrap.js"></script>
+</head>
+
+<body>
+  <nav class="navbar navbar-default" role="navigation">
+    <!-- Brand and toggle get grouped for better mobile display -->
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+        <span class="sr-only">uwants-repeater</span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand">Uwants-发帖机</a>
+    </div>
+
+    <!-- Collect the nav links, forms, and other content for toggling -->
+    <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+      <ul class="nav navbar-nav">
+        <li {{if eq .position "user"}}class="active"{{end}}>
+          <a href="/uwants/users">用户管理</a>
+        </li>
+        <li {{if eq .position "thread"}}class="active"{{end}}>
+          <a href="/uwants/threads">帖子管理</a>
+        </li>
+        <li class="dropdown {{if or (eq .position "reply") (eq .position "topic")}}active{{end}} ">
+          <a class="dropdown-toggle" data-toggle="dropdown">
+            发帖管理 <b class="caret"></b>
+          </a>
+          <ul class="dropdown-menu">
+            <li >
+              <a href="/uwants/topic">发帖</a>
+            </li>
+            <li class="divider"></li>
+            <li >
+              <a href="/uwants/reply">回帖</a>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </nav>
+  {{.LayoutContent}}
+</body>
+</html>

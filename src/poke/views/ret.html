@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+
+<html>
+  	<head>
+    	<title>Beego</title>
+    	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	</head>
+  	
+  	<body>
+	{{range .rets}}
+		<p>Username: {{.Username}}
+  		<p>Result: {{.Ret}}</p>
+		<p>URL: <a href="{{.URL}}">{{.URL}}</a></p>
+		<p>Title: {{.Title}}</p>
+		<p>Text: {{.Text}}</p>
+		<p>------------------------------</p>
+	{{end}}
+	</body>
+</html>
+

@@ -1,0 +1,76 @@
+<script>
+function useuser() {
+  $('#userselectav').append($('#userselectun').find('option:selected'))
+}
+function unuseuser() {
+  $('#userselectun').append($('#userselectav').find('option:selected')) 
+}
+function usethread() {
+  $('#threadselectav').append($('#threadselectun').find('option:selected'))
+}
+function unusethread() {
+  $('#threadselectun').append($('#threadselectav').find('option:selected')) 
+}
+function spawn() {
+  $.ajax({
+    type:'post',
+    data:$('#userselectav').val(),
+    url:'/uwants/topic'
+});
+}
+</script>
+<div style="height:50px"></div>
+<div class="row">
+  <div class="col-md-8 col-md-offset-2">
+    <form method="post" action="">
+      <div class="row">
+        <h4>用户选择 <span class="label label-default">选中要使用的用户点击使用按钮</span></h4>
+        <div class="col-md-5">
+          <select id="userselectun" multiple="multiple" class="form-control" style="width:100%">
+            {{range .users}}
+            <option value="{{.Id}}">{{.Username}}</option>
+            {{end}}
+          </select>
+        </div>
+        <div class="col-md-2">
+          <div class="row">
+            <div class="col-md-12" style="margin-bottom:10px;">
+              <button type="button" class="btn btn-success" onclick="useuser()">使用-></button>
+            </div>
+            <div class="col-md-12" style="margin-top:10px;">
+              <button type="button" class="btn btn-danger" onclick="unuseuser()">
+                <-停用</button></div>
+              </div>
+            </div>
+            <div class="col-md-5">
+              <select id="userselectav" multiple="multiple" class="form-control" style="width:100%" name="users"></select>
+            </div>
+          </div>
+          <div class="row" style="margin-top:30px;">
+            <h4>帖子选择 <span class="label label-default">选中要使用的帖子点击使用按钮</span></h4>
+            <div class="col-md-5">
+              <select multiple="multiple" class="form-control" style="width:100%" id="threadselectun">
+                {{range .threads}}
+                <option value="{{.Id}}">{{.Title}}</option>
+                {{end}}
+              </select>
+            </div>
+            <div class="col-md-2">
+              <div class="row">
+                <div class="col-md-12" style="margin-bottom:10px;">
+                  <button type="button" class="btn btn-success" onclick="usethread()">使用-></button>
+                </div>
+                <div class="col-md-12" style="margin-top:10px;">
+                  <button type="button" class="btn btn-danger" onclick="unusethread()">
+                    <-停用</button></div>
+                  </div>
+                </div>
+                <div class="col-md-5">
+                  <select multiple="multiple" class="form-control" style="width:100%" name="threads" id="threadselectav"></select>
+                </div>
+              </div>
+              <div style="margin-top:20px;"></div>
+              <button type="submit" class="btn btn-warning">发帖!</button>
+            </form>
+          </div>
+        </div>
