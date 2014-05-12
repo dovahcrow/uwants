@@ -1,20 +1,13 @@
-<!DOCTYPE html>
-
-<html>
-  	<head>
-    	<title>Beego</title>
-    	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-	</head>
-  	
-  	<body>
-	{{range .rets}}
-		<p>Username: {{.Username}}
-  		<p>Result: {{.Ret}}</p>
-		<p>URL: <a href="{{.URL}}">{{.URL}}</a></p>
-		<p>Title: {{.Title}}</p>
-		<p>Text: {{.Text}}</p>
-		<p>------------------------------</p>
-	{{end}}
-	</body>
-</html>
-
+<div class="container">
+<div class="row">
+	<div class="col-md-8 col-md-offset-2" >
+		{{if .ret}}
+		<div class="alert alert-danger" style="text-align:center">{{.ret}}</div>
+		<button type="button" class="btn btn-danger" onclick="location.reload()">返回</button>
+		{{else}}
+		<div class="alert alert-success" style="text-align:center">成功!</div>
+		<button type="button" class="btn btn-success" onclick="location.reload()">返回</button>
+		{{end}}
+	</div>
+</div>
+</div>

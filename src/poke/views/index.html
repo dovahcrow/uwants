@@ -1,0 +1,33 @@
+<div class="container">
+<div class="row">
+	<div class="col-md-8 col-md-offset-2">
+		<div class="jumbotron">
+			<div class="container">
+				<h1>Uwants 管理系统</h1>
+				<p>{{.version}}</p>
+				<p>
+					<a class="btn btn-primary btn-lg" role="button" data-toggle="modal" data-target="#myModal">使用帮助</a>
+				</p>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+        <h4 class="modal-title" id="myModalLabel">使用帮助</h4>
+      </div>
+      <div class="modal-body">
+        <p>帖子管理:可以在帖子管理中为帖子库添加备选帖子.可以有单条详细管理和多条批量管理两种模式.</p>
+        <p>用户管理:可以在用户管理中为用户库添加备选用户.可以有单条详细管理和多条批量管理两种模式.</p>
+        <p>发帖以及回帖:在选项框中选择发帖的用户以及帖子内容后,系统会根据已经选择的用户列表,随机选择其中的一个用户发送一条帖子,直至发送完所有帖子为止.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+</div>

@@ -1,0 +1,5 @@
+/src/snatch/snatchmain/snatchmain
+*.tar.gz
+/src/poke/poke
+/pkg
+/bin

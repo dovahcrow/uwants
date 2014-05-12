@@ -20,21 +20,43 @@
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
-      <a class="navbar-brand">Uwants-发帖机</a>
+      <a href="/uwants" class="navbar-brand">Uwants管理系统</a>
     </div>
 
     <!-- Collect the nav links, forms, and other content for toggling -->
     <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
       <ul class="nav navbar-nav">
-        <li {{if eq .position "user"}}class="active"{{end}}>
-          <a href="/uwants/users">用户管理</a>
+        <li class="dropdown {{if eq .position "user"}}active{{end}} ">
+          <a class="dropdown-toggle" data-toggle="dropdown">
+            {{if eq .subp "user-single"}}单条管理{{else if eq .subp "user-bunch"}}批量管理{{else}}用户管理{{end}} <b class="caret"></b>
+          </a>
+          <ul class="dropdown-menu">
+            <li >
+              <a href="/uwants/users/single">单条管理</a>
+            </li>
+            <li class="divider"></li>
+            <li >
+              <a href="/uwants/users/bunch">批量管理</a>
+            </li>
+          </ul>
         </li>
-        <li {{if eq .position "thread"}}class="active"{{end}}>
-          <a href="/uwants/threads">帖子管理</a>
+        <li class="dropdown {{if eq .position "thread"}}active{{end}} ">
+          <a class="dropdown-toggle" data-toggle="dropdown">
+            {{if eq .subp "thread-single"}}单条管理{{else if eq .subp "thread-bunch"}}批量管理{{else}}帖子管理{{end}}<b class="caret"></b>
+          </a>
+          <ul class="dropdown-menu">
+            <li >
+              <a href="/uwants/threads/single">单条管理</a>
+            </li>
+            <li class="divider"></li>
+            <li >
+              <a href="/uwants/threads/bunch">批量管理</a>
+            </li>
+          </ul>
         </li>
         <li class="dropdown {{if or (eq .position "reply") (eq .position "topic")}}active{{end}} ">
           <a class="dropdown-toggle" data-toggle="dropdown">
-            发帖管理 <b class="caret"></b>
+            {{if eq .subp "topic"}}发帖{{else if eq .subp "reply"}}回帖{{else}}发帖管理{{end}}<b class="caret"></b>
           </a>
           <ul class="dropdown-menu">
             <li >
@@ -43,6 +65,16 @@
             <li class="divider"></li>
             <li >
               <a href="/uwants/reply">回帖</a>
+            </li>
+          </ul>
+        </li>
+        <li class="dropdown {{if eq .position "record"}}active{{end}} ">
+          <a class="dropdown-toggle" data-toggle="dropdown">
+            发帖记录 <b class="caret"></b>
+          </a>
+          <ul class="dropdown-menu">
+            <li >
+              <a href="/uwants/records">帖子记录</a>
             </li>
           </ul>
         </li>

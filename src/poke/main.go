@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/config"
-	"poke/controllers"
+	_ "poke/controllers"
 	_ "poke/routers"
-	"time"
+
 	"uwants"
 )
 
@@ -18,11 +18,10 @@ func main() {
 	}
 	proxy := cfg.String(`proxy`)
 	uwants.Proxy = proxy
-	wait, err := cfg.Int(`waittime`)
-	if err != nil {
-		fmt.Println(`parse wait time error`)
-		return
-	}
-	controllers.Waittime = time.Duration(wait)
+
+	beego.SessionOn = true
+	beego.SessionCookieLifeTime = 3600
+	beego.SessionName = `boss!`
+	beego.SessionProvider = `memory`
 	beego.Run()
 }

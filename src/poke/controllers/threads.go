@@ -1,17 +1,19 @@
 package controllers
 
 import (
-	//"fmt"
+	"fmt"
 	"poke/base"
 	"poke/models"
+	"regexp"
 	"strconv"
+	"strings"
 )
 
 type ThreadController struct {
 	base.BaseController
 }
 
-func (this *ThreadController) Index() {
+func (this *ThreadController) Single() {
 	us, err := models.GetAllThreads()
 	if err != nil {
 		this.Data[`error`] = err
@@ -20,8 +22,44 @@ func (this *ThreadController) Index() {
 	}
 	this.Data[`threads`] = us
 	this.Data[`position`] = "thread"
-	this.TplNames = `threads.html`
+	this.Data[`subp`] = "thread-single"
+
+	this.TplNames = `threads-single.html`
 }
+
+func (this *ThreadController) Bunch() {
+	this.Data[`position`] = "thread"
+	this.Data[`subp`] = "thread-bunch"
+	this.TplNames = "threads-bunch.html"
+}
+func (this *ThreadController) BunchAdd() {
+	this.Data[`position`] = "thread"
+	this.Data[`subp`] = "thread-bunch"
+	this.TplNames = "ret.html"
+
+	bunchs := this.GetString(`threadsbatch`)
+	if strings.TrimSpace(bunchs) == `` {
+		this.Data[`ret`] = `输入数据不能为空`
+		return
+	}
+	bunch := regexp.MustCompile(`(.*)\|(.+)`).FindAllStringSubmatch(bunchs, -1)
+	ret := []string{}
+	for _, v := range bunch {
+		if len(v) < 3 {
+			ret = append(ret, fmt.Sprintf("数据不正确,缺少标题或内容: %v", v))
+			continue
+		}
+		err := models.CreateThread(v[1], v[2])
+		if err != nil {
+			ret = append(ret, fmt.Sprintf("添加 %v , %v 错误: %v", v[1], v[2], err))
+			continue
+		}
+	}
+
+	this.Data[`ret`] = ret
+
+}
+
 func (this *ThreadController) UpdateThread() {
 	ids := this.Ctx.Input.Param(`:id`)
 	id, _ := strconv.ParseInt(ids, 10, 0)

@@ -1,0 +1,15 @@
+<div class="row">
+	<div class="col-md-8 col-md-offset-2" >
+		{{range .rets}}
+		<p>Username: {{.Username}}</p>
+		<p>Result: {{.Ret}}</p>
+		<p>
+			URL:
+			<a href="{{.URL}}">{{.URL}}</a>
+		</p>
+		<p>Title: {{.Title}}</p>
+		<p>Text: {{.Text}}</p>
+		<p>------------------------------</p>
+		{{end}}
+	</div>
+</div>

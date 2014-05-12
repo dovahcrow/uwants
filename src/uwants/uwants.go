@@ -2,6 +2,7 @@ package uwants
 
 import (
 	"client"
+	//"github.com/astaxie/beego"
 	//"code.google.com/p/go.net/html"
 	"code.google.com/p/mahonia"
 	"fmt"
@@ -15,11 +16,12 @@ import (
 	"time"
 )
 
-var Proxy string
+var Proxy string = `http://127.0.0.1:8087`
 var root = `http://www.uwants.com/`
 
 type Uwants struct {
 	*client.Client
+	Decoder  mahonia.Decoder
 	username string
 	password string
 }
@@ -27,7 +29,10 @@ type Uwants struct {
 func New(username, password string) *Uwants {
 	u := &Uwants{}
 	u.Client = client.New()
-	u.UseProxy(Proxy)
+	u.Decoder = mahonia.NewDecoder(`big5`)
+	if Proxy != `` {
+		u.UseProxy(Proxy)
+	}
 	u.UseEncoder(`big5`)
 	u.username = strings.TrimSpace(username)
 	u.password = strings.TrimSpace(password)
@@ -70,10 +75,17 @@ func (this *Uwants) SendReply(tid string, title string, text string) (returl str
 	e(`获取帖子首页失败`, err)
 	defer re.Body.Close()
 
-	doc, err = goquery.NewDocumentFromReader(re.Body)
+	doc, err = goquery.NewDocumentFromReader(this.Decoder.NewReader(re.Body))
 	e(`创建页面索引失败`, err)
 
+	ht, _ := doc.Html()
+
 	hashvalue, ok := doc.Find(`#postform`).Find(`input[name="formhash"]`).Attr(`value`)
+	if !ok {
+		if strings.Contains(ht, `被禁用`) {
+			e(`账号被禁用`, false)
+		}
+	}
 	e(`获取回复哈希值失败`, ok)
 
 	actionvalue, ok := doc.Find(`#postform`).Attr(`action`)
@@ -114,8 +126,19 @@ func (this *Uwants) NewTopic(fid string, title string, text string) (topicaddr s
 
 	doc, err := goquery.NewDocumentFromReader(mahonia.NewDecoder(`big5`).NewReader(re.Body))
 	e(`解析板块页面失败`, err)
+
+	ht, _ := doc.Html()
 	postaddr, ok := doc.Find(`form#postform`).Attr(`action`)
+	//if !ok {
+	//	beego.Debug(doc.Html())
+	//}
+	if !ok {
+		if strings.Contains(ht, `被禁用`) {
+			e(`账号被禁用`, false)
+		}
+	}
 	e(`获取发帖地址失败`, ok)
+
 	hashvalue, ok := doc.Find(`form#postform`).Find(`input[name="formhash"]`).Attr(`value`)
 	e(`获取哈希失败`, ok)
 	postv := url.Values{}
@@ -135,10 +158,13 @@ func (this *Uwants) NewTopic(fid string, title string, text string) (topicaddr s
 	doc, err = goquery.NewDocumentFromReader(mahonia.NewDecoder(`big5`).NewReader(re.Body))
 	e(`发帖失败`, err)
 	target, ok := doc.Find(`meta[http-equiv="refresh"]`).Attr(`content`)
-	e(`获取发帖地址失败`, ok)
+	//if !ok {
+	//	beego.Debug(doc.Html())
+	//}
+	e(`获取发帖后地址失败`, ok)
 	targeturl := regexp.MustCompile(`url=(.+)`).FindStringSubmatch(target)
 	if len(targeturl) < 2 {
-		panic(fmt.Errorf(`解析发帖地址失败`))
+		panic(fmt.Errorf(`解析发帖后地址失败`))
 	}
 	return root + targeturl[1], nil
 }

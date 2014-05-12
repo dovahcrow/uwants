@@ -1,0 +1,107 @@
+
+<script>
+function deletethreads(id) {
+  $.ajax(
+  {
+    type:"get",
+    url: "/uwants/threads/delete/"+id,
+    success: function(data) {
+      location.reload()
+    }
+  })
+}
+function updatethreads(id) {
+  var f = $("form[action='/uwants/threads/update/"+id+"']");
+  if (/^\s*$/.test(f.find('input[name="title"]').val())) {
+    alert("标题不能为空");
+    return false;
+  }
+  if (/^\s*$/.test(f.find('textarea[name="text"]').val())) {
+    alert("内容不能为空");
+    return false;
+  }
+  var d = f.serialize();
+  $.post("/uwants/threads/update/"+id, d, function (result) { location.reload()});
+}
+function createthreads(){
+  var f = $("form[action='/uwants/threads/create']");
+  
+  if (/^\s*$/.test(f.find('input[name="title"]').val())) {
+    alert("标题不能为空");
+    return false;
+  }
+  if (/^\s*$/.test(f.find('textarea[name="text"]').val())) {
+    alert("内容不能为空");
+    return false;
+  }
+  var d = f.serialize();
+  $.post("/uwants/threads/create", d, function (result) { location.reload() });  
+}
+</script>
+<div class="container">
+  <div class="row" style="margin-top:50px">
+    <div class="col-md-8 col-md-offset-2">
+      <div class="alert alert-success">一行为一条帖子</div>
+      {{range .threads}}
+      <form action="/uwants/threads/update/{{.Id}}" method="post" onsubmit="false">
+        <div class="row" style="margin-top:5px;margin-bottom:5px;">
+          <div class="col-md-11">
+            <div class="panel-group" id="accordion">
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <h4 class="panel-title">
+                    <a data-toggle="collapse" data-toggle="collapse" data-parent="#accordion" href="#collapse{{.Id}}">
+                      <input type="text" class="form-control" placeholder="帖子标题" value="{{.Title}}" name="title"/>
+                    </a>
+                  </h4>
+                </div>
+                <div id="collapse{{.Id}}" class="panel-collapse collapse">
+                  <div class="panel-body">
+                    <textarea rows="5" class="form-control" placeholder="帖子内容" name="text">{{.Text}}</textarea>
+                    <div class="col-md-3 col-md-offset-5" style="margin-top:5px;">
+                      <div class="btn-group btn-group-sm">
+                        <button type="button" class="btn btn-warning" onclick="updatethreads({{.Id}})">更新</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-1" style="padding:9px 0px;">
+            <button type="button" class="btn btn-danger" onclick="deletethreads({{.Id}})">删除</button>
+          </div>
+        </div>
+      </form>
+      {{end}}
+      <form action="/uwants/threads/create" method="post">
+        <div class="row">
+          <div class="col-md-11">
+            <div class="panel-group" id="accordion">
+              <div class="panel panel-default">
+                <div class="panel-heading">
+                  <h4 class="panel-title">
+                    <a data-toggle="collapse" data-toggle="collapse" data-parent="#accordion" href="#collapse{{.Id}}">
+                      <input name="title" type="text" class="form-control" placeholder="帖子标题"/>
+                    </a>
+                  </h4>
+                </div>
+                <div id="collapse{{.Id}}" class="panel-collapse collapse">
+                  <div class="panel-body">
+                    <textarea rows="5" class="form-control" placeholder="帖子内容" name="text"></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+          <div class="col-md-1" style="padding:9px 0px;">
+
+            <button type="button" class="btn btn-success" onclick="createthreads()">添加</button>
+          </div>
+
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
