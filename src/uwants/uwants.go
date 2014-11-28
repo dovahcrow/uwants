@@ -16,7 +16,7 @@ import (
 	"time"
 )
 
-var Proxy string = `http://127.0.0.1:8087`
+var Proxy string = ``
 var root = `http://www.uwants.com/`
 
 type Uwants struct {
@@ -58,8 +58,13 @@ func (this *Uwants) Login() (err error) {
 	v := url.Values{}
 	v.Add(`username`, this.username)
 	v.Add(`password`, this.password)
-	_, err = this.PostForm(root+loginaddr, v)
+	re, err = this.PostForm(root+loginaddr, v)
 	e(`登陆失败`, err)
+	doc, err = goquery.NewDocumentFromReader(this.Decoder.NewReader(re.Body))
+	e(`登陆失败`, err)
+	if !strings.Contains(doc.Find(`div.box.message>p`).Text(), this.username) {
+		e(`登陆失败`, false)
+	}
 	return nil
 }
 
@@ -113,11 +118,13 @@ func (this *Uwants) SendReply(tid string, title string, text string) (returl str
 }
 
 func (this *Uwants) NewTopic(fid string, title string, text string) (topicaddr string, err error) {
+	var ht string
 	defer func() {
 		if e := recover(); e != nil {
 			err = e.(error)
 			return
 		}
+
 	}()
 
 	re, err := this.Get(`http://www.uwants.com/forumdisplay.php?fid=` + strings.TrimSpace(fid))
@@ -127,7 +134,7 @@ func (this *Uwants) NewTopic(fid string, title string, text string) (topicaddr s
 	doc, err := goquery.NewDocumentFromReader(mahonia.NewDecoder(`big5`).NewReader(re.Body))
 	e(`解析板块页面失败`, err)
 
-	ht, _ := doc.Html()
+	ht, _ = doc.Html()
 	postaddr, ok := doc.Find(`form#postform`).Attr(`action`)
 	//if !ok {
 	//	beego.Debug(doc.Html())
@@ -135,9 +142,11 @@ func (this *Uwants) NewTopic(fid string, title string, text string) (topicaddr s
 	if !ok {
 		if strings.Contains(ht, `被禁用`) {
 			e(`账号被禁用`, false)
+		} else {
+			fmt.Println(ht)
+			e(`获取发帖地址失败`, ok)
 		}
 	}
-	e(`获取发帖地址失败`, ok)
 
 	hashvalue, ok := doc.Find(`form#postform`).Find(`input[name="formhash"]`).Attr(`value`)
 	e(`获取哈希失败`, ok)
@@ -145,11 +154,17 @@ func (this *Uwants) NewTopic(fid string, title string, text string) (topicaddr s
 	postv.Add(`formhash`, hashvalue)
 	postv.Add(`subject`, strings.TrimSpace(title))
 	postv.Add(`message`, strings.TrimSpace(text))
+
 	if classes := doc.Find(`select[name="typeid"]`).Children().Length(); classes != 0 {
 		radint := rand.New(rand.NewSource(time.Now().Unix())).Intn(classes)
 		id, ok := doc.Find(`select[name="typeid"]`).Children().Eq(radint).Attr(`value`)
 		e(`获取分类id失败`, ok)
+		fmt.Println(doc.Html)
+		fmt.Println(id)
+
 		postv.Add(`typeid`, id)
+	} else {
+		fmt.Println(doc.Html)
 	}
 
 	re, err = this.PostForm(root+postaddr, postv)
@@ -157,11 +172,27 @@ func (this *Uwants) NewTopic(fid string, title string, text string) (topicaddr s
 	defer re.Body.Close()
 	doc, err = goquery.NewDocumentFromReader(mahonia.NewDecoder(`big5`).NewReader(re.Body))
 	e(`发帖失败`, err)
+	ht, _ = doc.Html()
 	target, ok := doc.Find(`meta[http-equiv="refresh"]`).Attr(`content`)
-	//if !ok {
-	//	beego.Debug(doc.Html())
-	//}
-	e(`获取发帖后地址失败`, ok)
+	if !ok {
+		switch {
+		case strings.Contains(ht, `數量超過上限`):
+			{
+				e(`发帖数量限制，请稍后再发`, false)
+			}
+		case strings.Contains(ht, `選擇主題的類別`):
+			{
+				e(`没有选择主题类别`, false)
+			}
+		default:
+			{
+				fmt.Println(ht)
+				e(`获取发帖后帖子地址失败`, ok)
+			}
+		}
+
+	}
+
 	targeturl := regexp.MustCompile(`url=(.+)`).FindStringSubmatch(target)
 	if len(targeturl) < 2 {
 		panic(fmt.Errorf(`解析发帖后地址失败`))

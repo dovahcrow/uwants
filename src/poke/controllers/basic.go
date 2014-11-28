@@ -10,7 +10,7 @@ type BasicController struct {
 }
 
 func (this *BasicController) Index() {
-	this.Data[`version`] = `版本 v1.1.2`
+	this.Data[`version`] = `版本 v1.2.0`
 	this.TplNames = "index.html"
 }
 

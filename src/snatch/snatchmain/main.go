@@ -6,6 +6,7 @@ import (
 	"runtime"
 	"snatch"
 	"sync"
+	"time"
 )
 
 func init() {
@@ -23,17 +24,25 @@ func main() {
 		log.Fatalln(err)
 	}
 
+	err = models.DeleteAllFids()
+	if err != nil {
+		log.Println(`delete all fids fail`, err)
+	}
 	err = models.InsertFids(avfids)
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	models.DeleteAllTids()
+	err = models.DeleteAllTids()
+	if err != nil {
+		log.Println(`delete all tids fail`, err)
+	}
 
 	wg := sync.WaitGroup{}
 	for _, v := range fids {
+		time.Sleep(3 * time.Second)
+		wg.Add(1)
 		go func(v string) {
-			wg.Add(1)
 			defer func() {
 				wg.Done()
 			}()
@@ -43,11 +52,13 @@ func main() {
 				log.Println(err)
 				return
 			}
+
 			avtids, err := snatch.ChkTidAv(tids)
 			if err != nil {
 				log.Println(err)
 				return
 			}
+	
 			err = models.InsertTids(avtids)
 			if err != nil {
 				log.Println(err)
@@ -57,5 +68,5 @@ func main() {
 
 	}
 	wg.Wait()
-
+	log.Println(`采集完毕`)
 }
